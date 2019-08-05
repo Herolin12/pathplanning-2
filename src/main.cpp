@@ -153,7 +153,8 @@ int main() {
            */
 
           // Transform sensor fusion into vehicle object
-          Vehicle ego = Vehicle(000, car_x, car_y, car_vx, car_vy, car_s, car_d, &map);
+          string state = "KL";
+          Vehicle ego = Vehicle(000, car_x, car_y, car_vx, car_vy, car_s, car_d, state,&map);
 
           vector<Vehicle> surrounding_vehicles;
           for (int i = 0; i < sensor_fusion.size(); i++){
@@ -164,7 +165,8 @@ int main() {
             double vy = sensor_fusion[i][4];
             double s = sensor_fusion[i][5];
             double d = sensor_fusion[i][6];
-            Vehicle v = Vehicle(id, x, y, vx, vy, s, d, &map);
+            string state = "KL";
+            Vehicle v = Vehicle(id, x, y, vx, vy, s, d, state,&map);
             surrounding_vehicles.push_back(v);
           }
           vector<Vehicle> vehicles_ahead = ego.ahead(surrounding_vehicles);

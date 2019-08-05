@@ -24,6 +24,7 @@ class Vehicle
         int lane;
         double speed;
         double theta;
+        string state;
 
         Mapping* map;
 
@@ -31,7 +32,7 @@ class Vehicle
          * Constructors
          */
         Vehicle();
-        Vehicle(int id, double x, double y, double vx, double vy, double s, double d, Mapping* map);
+        Vehicle(int id, double x, double y, double vx, double vy, double s, double d, string state, Mapping* map);
 
         /**
         * Destructor

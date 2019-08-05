@@ -7,18 +7,20 @@
 class Trajectory
 {
     public:
-        Vehicle* vehicle;
+        double x;
+        double y;
+        double s;
         double s_d;
         double s_dd;
+        double d;
         double d_d;
+        double d_dd;
+        double yaw;
 
         Trajectory();
-        Trajectory(Vehicle* vehicle, double s_d, double s_dd, double d_d, double d_dd);
+        Trajectory(double x, double y, double s, double s_d, double s_dd, double d, double d_d, double d_dd, double yaw);
 
         virtual ~Trajectory();
-
-    private:
-        double d_dd;
 
 };
 

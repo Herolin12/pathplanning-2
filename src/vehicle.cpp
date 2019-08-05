@@ -38,7 +38,7 @@ struct sort_greater {
 
 Vehicle::Vehicle() {}
 
-Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, double d, string state, Mapping* map)
+Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, double d, Mapping* map)
 {
     this->id = id;
     this->x = x;
@@ -47,6 +47,22 @@ Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, dou
     this->vy = vy;
     this->s = s;
     this->d = d;
+    this->map = map;
+    this->theta = get_theta(vx, vy);
+    this->lane = get_lane(this->d);
+    this->speed = get_speed();
+}
+
+Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double yaw, string state, Mapping* map)
+{
+    this->id = id;
+    this->x = x;
+    this->y = y;
+    this->vx = vx;
+    this->vy = vy;
+    this->s = s;
+    this->d = d;
+    this->yaw = yaw;
     this->state = state;
     this->map = map;
     this->theta = get_theta(vx, vy);

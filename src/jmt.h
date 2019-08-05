@@ -1,59 +1,66 @@
-#ifndef JMT
-#define JMT
+#ifndef JMT_H
+#define JMT_H
 
 #include <vector>
 #include "Eigen-3.3/Eigen/Dense"
-#include "jmt.h"
+
 
 using std::vector;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-vector<double> get_jmt(vector<double> &start, vector<double> &end, double T) {
-  /**
-   * Calculate the Jerk Minimizing Trajectory that connects the initial state
-   * to the final state in time T.
-   *
-   * @param start - the vehicles start location given as a length three array
-   *   corresponding to initial values of [s, s_dot, s_double_dot]
-   * @param end - the desired end state for vehicle. Like "start" this is a
-   *   length three array.
-   * @param T - The duration, in seconds, over which this maneuver should occur.
-   *
-   * @output an array of length 6, each value corresponding to a coefficent in 
-   *   the polynomial:
-   *   s(t) = a_0 + a_1 * t + a_2 * t**2 + a_3 * t**3 + a_4 * t**4 + a_5 * t**5
-   *
-   * EXAMPLE
-   *   > JMT([0, 10, 0], [10, 10, 0], 1)
-   *     [0.0, 10.0, 0.0, 0.0, 0.0, 0.0]
-   */
-   
-  double a_0 = start[0];
-  double a_1 = start[1];
-  double a_2 = start[2]/2;
-   
-  MatrixXd A = MatrixXd(3, 3);
-  A << pow(T, 3), pow(T, 4), pow(T, 5),
-       3*pow(T, 2), 4*pow(T, 3), 5*pow(T, 4),
-       6*T, 12*pow(T,2), 20*pow(T, 3);
+vector<double> JMT(vector<double> start, vector<double> end, double T){
+    double a_0 = start[0];
+    double a_1 = start[1];
+    double a_2 = start[2]/2;
+    
+    MatrixXd A = MatrixXd(3, 3);
+    A << pow(T, 3), pow(T, 4), pow(T, 5),
+        3*pow(T, 2), 4*pow(T, 3), 5*pow(T, 4),
+        6*T, 12*pow(T,2), 20*pow(T, 3);
 
-  MatrixXd B = MatrixXd(3,1);     
-  B << end[0]-(start[0]+start[1]*T+.5*start[2]*T*T),
-       end[1]-(start[1]+start[2]*T),
-       end[2]-start[2];
-   
-  MatrixXd Ai = A.inverse();
-  MatrixXd delta = Ai*B;
-  
-  vector<double> results;
-  results = {start[0], start[1], .5*start[2]};
+    MatrixXd B = MatrixXd(3,1);
+    B << end[0]-(start[0]+start[1]*T+.5*start[2]*pow(T, 2)),
+        end[1]-(start[1]+start[2]*T),
+        end[2]-start[2];
+    
+    MatrixXd delta = A.inverse()*B;
+    
+    vector<double> results;
+    results = {start[0], start[1], .5*start[2]};
 
-  for(int i = 0; i < delta.size(); ++i) {
-    results.push_back(delta.data()[i]);
-  }
-  
-  return results;
+    for(int i = 0; i < delta.size(); ++i) {
+        results.push_back(delta.data()[i]);
+    }
+    
+    return results;
+}
+
+vector<vector<double>> get_jmt(vector<double> initial, vector<double> final, double T){
+    double si = initial[0];
+    double si_d = initial[1];
+    double si_dd = initial[2];
+    double di = initial[3];
+    double di_d = initial[4];
+    double di_dd = initial[5];
+    double sf = final[0];
+    double sf_d = final[1];
+    double sf_dd = final[2];
+    double df = final[3];
+    double df_d = final[4];
+    double df_dd = final[5];
+
+    vector<double> start_s = {si, si_d, si_dd};
+    vector<double> end_s = {sf, sf_d, sf_dd};
+    vector<double> start_d = {di, di_d, di_dd};
+    vector<double> end_d = {df, df_d, df_dd};
+
+    vector<double> jmt_s = JMT(start_s, end_s, T);
+    vector<double> jmt_d = JMT(start_d, end_d, T);
+
+    vector<vector<double>> output = {jmt_s, jmt_d};
+    
+    return output;
 }
 
 #endif

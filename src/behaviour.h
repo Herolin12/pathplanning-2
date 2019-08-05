@@ -26,3 +26,5 @@ class Behaviour {
 
         vector<string> available_states()
 }
+
+#endif

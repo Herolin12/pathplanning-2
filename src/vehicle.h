@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include "mapping.h"
+#include "behaviour.h"
 
 class Vehicle
 {
@@ -23,13 +24,13 @@ class Vehicle
         int lane;
         double speed;
         double theta;
-        string state;
+        State state;
 
         Mapping* map;
 
         Vehicle();
         Vehicle(int id, double x, double y, double vx, double vy, double s, double d, Mapping* map);
-        Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double yaw, string state, Mapping* map);
+        Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double yaw, State state, Mapping* map);
 
         virtual ~Vehicle();
 

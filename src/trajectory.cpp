@@ -31,8 +31,6 @@ Trajectory::Trajectory(double x, double y, double s, double s_d, double s_dd, do
     this->yaw = yaw;
 }
 
-Trajectory Trajectory::generate(string state, vector<Vehicle> predictions, double T){
-    
-}
+double Trajectory::Trajectory cost(State state, vector<Vehicle> predictions,double T)
 
 Trajectory::~Trajectory(){}

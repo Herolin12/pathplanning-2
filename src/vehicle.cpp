@@ -3,6 +3,7 @@
 #include <utility>
 #include <algorithm>
 #include "vehicle.h"
+#include "behaviour.h"
 #include "helpers.h"
 #include "mapping.h"
 #include "constants.h"
@@ -53,7 +54,7 @@ Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, dou
     this->speed = get_speed();
 }
 
-Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double yaw, string state, Mapping* map)
+Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double yaw, State state, Mapping* map)
 {
     this->id = id;
     this->x = x;

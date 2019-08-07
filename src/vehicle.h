@@ -41,6 +41,14 @@ class Vehicle
 
         vector<Vehicle> behind(vector<Vehicle> others);
 
+        vector<Vehicle> side(vector<Vehicle> others, char mode);
+
+        bool sort_distance_to_ego(const Vehicle& left, const Vehicle& right);
+
+        bool sort_increment(const Vehicle& left, const Vehicle& right);
+
+        bool sort_decrement(const Vehicle& left, const Vehicle& right);
+
     private:
         double get_speed() const;
 };

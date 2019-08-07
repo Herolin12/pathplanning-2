@@ -13,11 +13,6 @@ using std::string;
 using std::vector;
 using tk::spline;
 
-// Calculate distance between two points
-double distance(double x1, double y1, double x2, double y2) {
-  return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
-}
-
 // Calculate closest waypoint to current x, y position
 int ClosestWaypoint(double x, double y, const vector<double> &maps_x, 
                     const vector<double> &maps_y) {
@@ -27,7 +22,7 @@ int ClosestWaypoint(double x, double y, const vector<double> &maps_x,
   for (int i = 0; i < maps_x.size(); ++i) {
     double map_x = maps_x[i];
     double map_y = maps_y[i];
-    double dist = distance(x,y,map_x,map_y);
+    double dist = get_distance(x,y,map_x,map_y);
     if (dist < closestLen) {
       closestLen = dist;
       closestWaypoint = i;
@@ -146,13 +141,13 @@ vector<double> Mapping::getFrenet(double x, double y, double theta) {
   double proj_x = proj_norm*n_x;
   double proj_y = proj_norm*n_y;
 
-  double frenet_d = distance(x_x,x_y,proj_x,proj_y);
+  double frenet_d = get_distance(x_x,x_y,proj_x,proj_y);
 
   //see if d value is positive or negative by comparing it to a center point
   double center_x = 1000-this->map_x[prev_wp];
   double center_y = 2000-this->map_y[prev_wp];
-  double centerToPos = distance(center_x,center_y,x_x,x_y);
-  double centerToRef = distance(center_x,center_y,proj_x,proj_y);
+  double centerToPos = get_distance(center_x,center_y,x_x,x_y);
+  double centerToRef = get_distance(center_x,center_y,proj_x,proj_y);
 
   if (centerToPos <= centerToRef) {
     frenet_d *= -1;
@@ -161,7 +156,7 @@ vector<double> Mapping::getFrenet(double x, double y, double theta) {
   // calculate s value
   double frenet_s = 0;
   for (int i = 0; i < prev_wp; ++i) {
-    frenet_s += distance(this->map_x[i],this->map_y[i],this->map_x[i+1],this->map_y[i+1]);
+    frenet_s += get_distance(this->map_x[i],this->map_y[i],this->map_x[i+1],this->map_y[i+1]);
   }
 
   frenet_s += distance(0,0,proj_x,proj_y);

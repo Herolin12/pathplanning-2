@@ -27,8 +27,8 @@ int get_lane(double d){
 
     return lane;
 }
-
-struct sort_greater {
+/*
+struct sort_increment {
     bool operator()(const Vehicle& x, const Vehicle& y) {
         if (x.s != y.s) {
             return x.s < y.s;
@@ -36,6 +36,16 @@ struct sort_greater {
         return x.id < y.id;
     }
 };
+
+struct sort_decrement {
+    bool operator()(const Vehicle& x, const Vehicle& y) {
+        if (x.s != y.s) {
+            return x.s > y.s;
+        }
+        return x.id > y.id;
+    }
+};
+ */
 
 Vehicle::Vehicle() {}
 
@@ -87,7 +97,7 @@ vector<Vehicle> Vehicle::ahead(vector<Vehicle> others) {
     }
 
     if (vehicles_ahead.size() > 1) {
-        sort(vehicles_ahead.begin(), vehicles_ahead.end(), sort_greater());
+        sort(vehicles_ahead.begin(), vehicles_ahead.end(), sort_increment);
     }
     return vehicles_ahead;
 }
@@ -102,7 +112,35 @@ vector<Vehicle> Vehicle::behind(vector<Vehicle> others) {
             continue;
         }
     }
+    if (vehicles_behind.size() > 1) {
+        sort(vehicles_behind.begin(), vehicles_behind.end(), sort_decrement);
+    }
     return vehicles_behind;
+}
+
+vector<Vehicle> Vehicle::side(vector<Vehicle> others, char mode) {
+    vector<Vehicle> vehicles_side;
+    int check_lane;
+    if (mode == 'L'){
+        check_lane = this->s - 1;
+    }
+    else if (mode == 'R'){
+        check_lane = this->s + 1;
+    }
+
+    for (Vehicle &v: others){
+        if (v.lane == check_lane){
+            vehicles_side.push_back(v);
+        }
+        else {
+            continue;
+        }
+    }
+
+    if (vehicles_side.size() > 1){
+        sort(vehicles_side.begin(), vehicles_side.end(), sort_distance_to_ego);
+    }
+    return vehicles_side;
 }
 
 Vehicle Vehicle::predict_position(double t){
@@ -111,6 +149,18 @@ Vehicle Vehicle::predict_position(double t){
     double theta = atan2(new_x - this->y, new_y - this->x);
     vector<double> frenet = this->map->getFrenet(new_x, new_y, theta);
     return Vehicle(this->id, new_x, new_y, this->vx, this->vy, frenet[0], frenet[1], this->map);
+}
+
+bool Vehicle::sort_distance_to_ego(const Vehicle& left, const Vehicle& right){
+    return get_distance(this->x, this->y, left.x, left.y) < get_distance(this->x, this->y, right.x, right.y);
+}
+
+bool Vehicle::sort_increment(const Vehicle& left, const Vehicle& right){
+    return abs(this->s - left.s) < abs(this->s - right.s);
+}
+
+bool Vehicle::sort_decrement(const Vehicle& left, const Vehicle& right){
+    return abs(this->s - left.s) > abs(this->s - right.s);
 }
 
 Vehicle::~Vehicle() {}

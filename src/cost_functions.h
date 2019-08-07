@@ -23,8 +23,7 @@ vector<vector<Vehicle>> prepare_cost(Vehicle ego, vector<Vehicle> const others){
     vector<Vehicle> vehicles_behind = ego.behind(others);
     vector<Vehicle> vehicles_left = ego.side(others, 'L');
     vector<Vehicle> vehicles_right = ego.side(others, 'R');
-
-    return {vehicles_ahead, vehicles_behind, vehicles_left, vehicles_right}; 
+    return {vehicles_ahead, vehicles_behind, vehicles_left, vehicles_right};
 }
 
 float costfunc_Speed(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
@@ -200,6 +199,28 @@ float costfunc_Collision(State state, Vehicle ego, vector<vector<Vehicle>> const
     int final_lane = state.intended_lane;
     vector<Vehicle> vehicles_ahead = surroundings[0];
     vector<Vehicle> vehicles_behind = surroundings[1];
+    float lat_cost, long_cost, cost;
+    char mode;
+    double long_weight = 0;
+    double lat_weight = 0;
+
+    if (state.id == "KL"){
+        lat_cost = 0;
+        long_cost = costfunc_LongitudinalCollision(state, ego, surroundings, T, weight);
+    }
+    else if (state.id != "KL"){
+        if (state.id.back() == 'L'){
+            mode = 'L';
+        }
+        else if (state.id.back() == 'R'){
+            mode = 'R';
+        }
+
+        lat_cost = costfunc_LatitudinalCollision(state, ego, surroundings, T, weight, mode);
+        long_cost = costfunc_LongitudinalCollision(state, ego, surroundings, T, weight);
+    }
+
+
     double cost = 0;
 
     float cost;

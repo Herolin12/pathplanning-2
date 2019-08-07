@@ -111,6 +111,14 @@ int main() {
           double end_path_d = j[1]["end_path_d"];
           
           int previous_size = previous_path_x.size();
+          vector<double> points_x, points_y;
+
+          for (int i = 0; i < PREVIOUS_POINTS_USED; i++){
+            points_x.push_back(previous_path_x[i]);
+            points_y.push_back(previous_path_y[i]);
+          }
+
+
           double car_vx, car_vy;
           double px1, px2, py1, py2;
           if (previous_size >= 2){
@@ -153,8 +161,8 @@ int main() {
            */
 
           // Transform sensor fusion into vehicle object
-          string state = "KL";
-          Vehicle ego = Vehicle(000, car_x, car_y, car_vx, car_vy, car_s, car_d, state,&map);
+          State state;
+          Vehicle ego = Vehicle(000, car_x, car_y, car_vx, car_vy, car_s, car_d, car_yaw, state, &map);
 
           vector<Vehicle> surrounding_vehicles;
           for (int i = 0; i < sensor_fusion.size(); i++){
@@ -165,8 +173,8 @@ int main() {
             double vy = sensor_fusion[i][4];
             double s = sensor_fusion[i][5];
             double d = sensor_fusion[i][6];
-            string state = "KL";
-            Vehicle v = Vehicle(id, x, y, vx, vy, s, d, state,&map);
+            State state;
+            Vehicle v = Vehicle(id, x, y, vx, vy, s, d, &map);
             surrounding_vehicles.push_back(v);
           }
           vector<Vehicle> vehicles_ahead = ego.ahead(surrounding_vehicles);
@@ -185,7 +193,7 @@ int main() {
           vector<double> xy;
           distance_spacing = 0.224;
 
-          if ((!vehicles_ahead.empty()) && ((car_ahead.s - ego.s) <= SAFE_RANGE)){
+          if ((!vehicles_ahead.empty()) && ((car_ahead.s - ego.s) <= BUFFER_RANGE)){
             slow_down = true;
           }
           else {

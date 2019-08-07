@@ -159,7 +159,7 @@ vector<double> Mapping::getFrenet(double x, double y, double theta) {
     frenet_s += get_distance(this->map_x[i],this->map_y[i],this->map_x[i+1],this->map_y[i+1]);
   }
 
-  frenet_s += distance(0,0,proj_x,proj_y);
+  frenet_s += get_distance(0,0,proj_x,proj_y);
 
   return {frenet_s,frenet_d};
 }

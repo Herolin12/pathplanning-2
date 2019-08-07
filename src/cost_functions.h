@@ -28,6 +28,7 @@ vector<vector<Vehicle>> prepare_cost(Vehicle ego, vector<Vehicle> const others){
 }
 
 float costfunc_Speed(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
+    // cost function for maintaining highest speed/ speed limit possible
     float target_speed = MAX_SPEED_MS;
     float cost;
     if (ego.speed > target_speed){
@@ -40,6 +41,7 @@ float costfunc_Speed(State state, Vehicle ego, vector<vector<Vehicle>> const sur
 }
 
 float costfunc_BufferDistance(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
+    // cost function for buffering a distance with other surroundings vehicles
     double buffer = BUFFER_RANGE;
     vector<Vehicle> ahead = surroundings[0];
     vector<Vehicle> behind = surroundings[1];
@@ -64,6 +66,7 @@ float costfunc_BufferDistance(State state, Vehicle ego, vector<vector<Vehicle>> 
 }
 
 float costfunc_LaneChange(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
+    // Cost function for lane changing
     int start_lane = state.current_lane;
     int final_lane = state.intended_lane;
     float current_speed = ego.speed;
@@ -76,6 +79,7 @@ float costfunc_LaneChange(State state, Vehicle ego, vector<vector<Vehicle>> cons
 }
 
 float lane_speed(vector<vector<Vehicle>> const surroundings, int lane){
+    // To get driving speed in selected lane
     float speed;
     for (int i = 0; i < surroundings.size(); i++){
         // If found vehicle in the lane
@@ -115,9 +119,9 @@ float costfunc_LongitudinalCollision(State state, Vehicle ego, vector<vector<Veh
     vector<Vehicle> vehicles_behind = surroundings[1];
     float cost_1, cost_2, cost, distance;
     // distance, speed, predicted position
+    Vehicle next_ego = ego.predict_position(T);
     if (!vehicles_ahead.empty()){
         Vehicle predicted = vehicles_ahead[0].predict_position(T);
-        Vehicle next_ego = ego.predict_position(T);
         cost_1 = exp(-((predicted.s - next_ego.s)/ buffer));
     }
     else if (vehicles_ahead.empty()){
@@ -126,7 +130,6 @@ float costfunc_LongitudinalCollision(State state, Vehicle ego, vector<vector<Veh
 
     if (!vehicles_behind.empty()){
         Vehicle predicted = vehicles_behind[0].predict_position(T);
-        Vehicle next_ego = ego.predict_position(T);
         cost_2 = exp(-((next_ego.s - predicted.s)/ buffer));
     }
     else if (vehicles_behind.empty()){
@@ -149,7 +152,6 @@ float costfunc_LatitudinalCollision(State state, Vehicle ego, vector<vector<Vehi
 
     // distance, speed, predicted position
     Vehicle next_ego = ego.predict_position(T);
-
     if (mode == 'L'){
         if (!vehicles_left.empty()){
             for (Vehicle &v: vehicles_left){

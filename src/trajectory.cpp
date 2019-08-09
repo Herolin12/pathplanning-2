@@ -19,7 +19,8 @@ using std::sort;
 
 Trajectory::Trajectory(){}
 
-Trajectory::Trajectory(double x, double y, double s, double s_d, double s_dd, double d, double d_d, double d_dd, double yaw){
+Trajectory::Trajectory(vector<double> x, vector<double> y, vector<double> s, vector<double> s_d, vector<double> s_dd,
+                        vector<double> d, vector<double> d_d, vector<double> d_dd, vector<double> yaw, vector<double> target){
     this->x = x;
     this->y = y;
     this->s = s;
@@ -29,8 +30,9 @@ Trajectory::Trajectory(double x, double y, double s, double s_d, double s_dd, do
     this->d_d = d_d;
     this->d_dd = d_dd;
     this->yaw = yaw;
+    this->target = target;
 }
 
-double Trajectory::Trajectory cost(State state, vector<Vehicle> predictions,double T)
+//double Trajectory::Trajectory cost(State state, vector<Vehicle> predictions,double T)
 
 Trajectory::~Trajectory(){}

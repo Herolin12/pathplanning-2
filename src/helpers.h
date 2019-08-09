@@ -74,5 +74,9 @@ vector<double> getXY(double s, double d, vector<double> maps_s,
   return {x,y};
 }
 
+vector<double> get_prev_kinematics(vector<double> previous_x, vector<double> previous_y, int lane){
+  int gg = 1;
+}
+
 
 #endif  // HELPERS_H

@@ -4,21 +4,22 @@
 #include <vector>
 #include "vehicle.h"
 
-class Trajectory
-{
+class Trajectory {
     public:
-        double x;
-        double y;
-        double s;
-        double s_d;
-        double s_dd;
-        double d;
-        double d_d;
-        double d_dd;
-        double yaw;
+        vector<double> x;
+        vector<double> y;
+        vector<double> s;
+        vector<double> s_d;
+        vector<double> s_dd;
+        vector<double> d;
+        vector<double> d_d;
+        vector<double> d_dd;
+        vector<double> yaw;
+        vector<double> target;
 
         Trajectory();
-        Trajectory(double x, double y, double s, double s_d, double s_dd, double d, double d_d, double d_dd, double yaw);
+        Trajectory(vector<double> x, vector<double> y, vector<double> s, vector<double> s_d, vector<double> s_dd,
+                    vector<double> d, vector<double> d_d, vector<double> d_dd, vector<double> yaw, vector<double> target);
 
         virtual ~Trajectory();
 

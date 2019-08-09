@@ -32,13 +32,13 @@ class State {
 
 class Behaviour {
     public:
-        double s;
-        double d;
         int lane;
         double ref_vel;
+        int current_timestep;
         State current_state;
 
-        Behaviour(Vehicle ego, double ref_vel);
+        Behaviour();
+        Behaviour(double ref_vel);
 
         virtual ~Behaviour();
 

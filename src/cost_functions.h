@@ -259,7 +259,6 @@ float subcost_Acceleration(State state, Vehicle ego, Trajectory trajectory, doub
 float subcost_Jerk(State state, Vehicle ego, Trajectory trajectory, double T, double weight){
     double max_jerk = MAX_JERK;
     float cost = 0;
-
     return cost;
 }
 

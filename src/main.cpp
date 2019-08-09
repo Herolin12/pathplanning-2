@@ -8,9 +8,9 @@
 #include "Eigen-3.3/Eigen/Dense"
 #include "mapping.cpp"
 #include "vehicle.cpp"
+#include "jmt.h"
 #include "helpers.h"
 #include "constants.h"
-#include "jmt.h"
 #include "json.hpp"
 
 // for convenience
@@ -113,10 +113,13 @@ int main() {
           int previous_size = previous_path_x.size();
           vector<double> points_x, points_y;
 
-          for (int i = 0; i < PREVIOUS_POINTS_USED; i++){
-            points_x.push_back(previous_path_x[i]);
-            points_y.push_back(previous_path_y[i]);
+          for (int i = 0; i < NUM_OF_PREVIOUS_POINTS; i++){
+            points_x.push_back(previous_path_x[previous_size-i]);
+            points_y.push_back(previous_path_y[previous_size-i]);
           }
+
+
+
 
 
           double car_vx, car_vy;

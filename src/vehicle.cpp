@@ -3,7 +3,6 @@
 #include <utility>
 #include <algorithm>
 #include "vehicle.h"
-#include "behaviour.h"
 #include "helpers.h"
 #include "mapping.h"
 #include "constants.h"
@@ -96,8 +95,8 @@ vector<Vehicle> Vehicle::ahead(vector<Vehicle> others) {
         }
     }
 
-    if (vehicles_ahead.size() > 1) {
-        sort(vehicles_ahead.begin(), vehicles_ahead.end(), sort_increment);
+    if (vehicles_ahead.size() > 1){
+        sort(vehicles_ahead.begin(), vehicles_ahead.end(), [this](Vehicle left, Vehicle right){return sort_increment(left, right);});
     }
     return vehicles_ahead;
 }
@@ -112,8 +111,8 @@ vector<Vehicle> Vehicle::behind(vector<Vehicle> others) {
             continue;
         }
     }
-    if (vehicles_behind.size() > 1) {
-        sort(vehicles_behind.begin(), vehicles_behind.end(), sort_decrement);
+    if (vehicles_behind.size() > 1){
+        sort(vehicles_behind.begin(), vehicles_behind.end(), [this](Vehicle left, Vehicle right){return sort_decrement(left, right);});
     }
     return vehicles_behind;
 }
@@ -138,7 +137,7 @@ vector<Vehicle> Vehicle::side(vector<Vehicle> others, char mode) {
     }
 
     if (vehicles_side.size() > 1){
-        sort(vehicles_side.begin(), vehicles_side.end(), sort_distance_to_ego);
+        sort(vehicles_side.begin(), vehicles_side.end(), [this](Vehicle left, Vehicle right){return sort_distance_to_ego(left, right);});
     }
     return vehicles_side;
 }

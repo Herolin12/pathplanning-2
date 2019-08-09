@@ -4,9 +4,9 @@
 #include <vector>
 #include "mapping.h"
 #include "behaviour.h"
+#include "constants.h"
 
-class Vehicle
-{
+class Vehicle {
     public:
         int id;
 

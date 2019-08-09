@@ -4,10 +4,10 @@
 #include <vector>
 #include "behaviour.h"
 #include "trajectory.h"
-#include "jmt.h"
 #include "vehicle.h"
-#include "helpers.h"
 #include "mapping.h"
+#include "jmt.h"
+#include "helpers.h"
 #include "constants.h"
 #include "spline.h"
 
@@ -27,12 +27,12 @@ State::State(string id, int current_lane, int intended_lane){
 
 State::~State(){}
 
-Behaviour::Behaviour(Vehicle ego, double ref_vel){
-    this->s = ego.s;
-    this->d = ego.d;
-    this->lane = ego.lane;
-    this->current_state = ego.state;
+Behaviour::Behaviour(){}
+
+Behaviour::Behaviour(double ref_vel){
+    this->lane = 0;
     this->ref_vel = ref_vel;
+    this->current_timestep = 0;
 }
 
 vector<string> Behaviour::available_states(){

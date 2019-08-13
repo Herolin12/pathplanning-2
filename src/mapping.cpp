@@ -3,7 +3,6 @@
 #include <vector>
 #include <math.h>
 #include "mapping.h"
-#include "trajectory.h"
 #include "spline.h"
 #include "helpers.h"
 #include "constants.h"
@@ -55,11 +54,11 @@ int NextWaypoint(double x, double y, double theta, const vector<double> &maps_x,
   return closestWaypoint;
 }
 
-spline s;
-spline Mapping::spline_x = s;
-spline Mapping::spline_y = s;
-spline Mapping::spline_dy = s;
-spline Mapping::spline_dx = s;
+spline spline_s;
+spline Mapping::spline_x = spline_s;
+spline Mapping::spline_y = spline_s;
+spline Mapping::spline_dy = spline_s;
+spline Mapping::spline_dx = spline_s;
 
 Mapping::Mapping(vector<double> waypoints_s, vector<double> waypoints_x, vector<double> waypoints_y,
          vector<double> waypoints_dx, vector<double> waypoints_dy, double separation,

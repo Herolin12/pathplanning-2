@@ -3,11 +3,10 @@
 #include <string>
 #include <vector>
 #include "trajectory.h"
+#include "vehicle.h"
 #include "behaviour.h"
 #include "jmt.h"
-#include "vehicle.h"
 #include "helpers.h"
-#include "mapping.h"
 #include "constants.h"
 #include "spline.h"
 
@@ -19,20 +18,47 @@ using std::sort;
 
 Trajectory::Trajectory(){}
 
-Trajectory::Trajectory(vector<double> x, vector<double> y, vector<double> s, vector<double> s_d, vector<double> s_dd,
-                        vector<double> d, vector<double> d_d, vector<double> d_dd, vector<double> yaw, vector<double> target){
+Trajectory::Trajectory(State* state, Vehicle* ego, vector<double> start, vector<double> target, vector<double> x, vector<double> y,
+                        vector<vector<double>> kinematics_s, vector<vector<double>> kinematics_d, double time_to_complete){
+    this->state = state;
+    this->ego = ego;
+    this->start = start;
+    this->target = target;
     this->x = x;
     this->y = y;
-    this->s = s;
-    this->s_d = s_d;
-    this->s_dd = s_dd;
-    this->d = d;
-    this->d_d = d_d;
-    this->d_dd = d_dd;
-    this->yaw = yaw;
-    this->target = target;
+    this->time_to_complete = time_to_complete;
 }
 
-//double Trajectory::Trajectory cost(State state, vector<Vehicle> predictions,double T)
+void Trajectory::generate(){
+    double T = this->state->time_ahead;
+    this->jmt = get_jmt(this->start, this->target, T);
+    vector<double> alpha_s = jmt[0];
+    vector<double> alpha_d = jmt[1];
+    vector<double> xy, next_s, next_d;
+    double xt, yt;
+    double t = 0;
+
+    while (t < T){
+        t += PATH_TIMESTEP;
+        vector<vector<double>> next_waypoints = generation_next_waypoints(start, target, alpha_s, alpha_d, t);
+        next_s = next_waypoints[0];
+        next_d = next_waypoints[1];
+        xy = this->ego->map->getXY(next_s[0], next_d[1]);
+        xt = xy[0];
+        yt = xy[1];
+        this->x.push_back(xt);
+        this->y.push_back(yt);
+        this->kinematics_s.push_back(next_s);
+        this->kinematics_d.push_back(next_d);
+    }
+}
+
+float Trajectory::cost(vector<vector<Vehicle>> surroundings){
+    float cost;
+    float legality_cost = costfunc_Legality(this->ego, surroundings, this->time_to_complete, LEGALITY_COST);
+
+    cost = legality_cost;
+    return cost;
+}
 
 Trajectory::~Trajectory(){}

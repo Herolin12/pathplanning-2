@@ -3,29 +3,14 @@
 #include <utility>
 #include <algorithm>
 #include "vehicle.h"
-#include "helpers.h"
+#include "behaviour.h"
 #include "mapping.h"
+#include "helpers.h"
 #include "constants.h"
 
 using std::sort;
 using namespace std;
 
-int get_lane(double d){
-    double new_d = d/ LANE_WIDTH;
-    int lane;
-
-    if (new_d < 1){
-        lane = 0;
-    }
-    else if ((new_d >= 1) && (new_d < 2)){
-        lane = 1;
-    }
-    else if (new_d >= 2){
-        lane = 2;
-    }
-
-    return lane;
-}
 /*
 struct sort_increment {
     bool operator()(const Vehicle& x, const Vehicle& y) {
@@ -46,10 +31,8 @@ struct sort_decrement {
 };
  */
 
-Vehicle::Vehicle() {}
-
-Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, double d, Mapping* map)
-{
+Vehicle::Vehicle(){}
+Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, double d, Mapping* map){
     this->id = id;
     this->x = x;
     this->y = y;
@@ -59,12 +42,11 @@ Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, dou
     this->d = d;
     this->map = map;
     this->theta = get_theta(vx, vy);
-    this->lane = get_lane(this->d);
+    this->lane = d2lane(this->d);
     this->speed = get_speed();
 }
-
-Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double yaw, State state, Mapping* map)
-{
+Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double yaw,
+                    vector<double> kinematics, State* state, Mapping* map){
     this->id = id;
     this->x = x;
     this->y = y;
@@ -73,10 +55,11 @@ Vehicle::Vehicle(int id, double x, double y, double vx, double vy, double s, dou
     this->s = s;
     this->d = d;
     this->yaw = yaw;
+    this->kinematics = kinematics;
     this->state = state;
     this->map = map;
     this->theta = get_theta(vx, vy);
-    this->lane = get_lane(this->d);
+    this->lane = d2lane(this->d);
     this->speed = get_speed();
 }
 
@@ -84,7 +67,7 @@ double Vehicle::get_speed() const {
     return sqrt(this->vx * this->vx + this->vy * this->vy);
 }
 
-vector<Vehicle> Vehicle::ahead(vector<Vehicle> others) {
+vector<Vehicle> Vehicle::ahead(vector<Vehicle> others){
     vector<Vehicle> vehicles_ahead;
     for (Vehicle &v: others){
         if ((v.lane == this->lane) && (v.s >= this->s)){
@@ -101,7 +84,7 @@ vector<Vehicle> Vehicle::ahead(vector<Vehicle> others) {
     return vehicles_ahead;
 }
 
-vector<Vehicle> Vehicle::behind(vector<Vehicle> others) {
+vector<Vehicle> Vehicle::behind(vector<Vehicle> others){
     vector<Vehicle> vehicles_behind;
     for (Vehicle &v: others){
         if ((v.lane == this->lane) && (v.s < this->s)){
@@ -117,7 +100,7 @@ vector<Vehicle> Vehicle::behind(vector<Vehicle> others) {
     return vehicles_behind;
 }
 
-vector<Vehicle> Vehicle::side(vector<Vehicle> others, char mode) {
+vector<Vehicle> Vehicle::side(vector<Vehicle> others, char mode){
     vector<Vehicle> vehicles_side;
     int check_lane;
     if (mode == 'L'){

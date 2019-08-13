@@ -36,31 +36,31 @@ float lane_speed(vector<vector<Vehicle>> const surroundings, int lane){
     return MAX_SPEED_MS;
 }
 
-vector<vector<Vehicle>> prepare_cost(Vehicle ego, vector<Vehicle> const others){
-    vector<Vehicle> vehicles_ahead = ego.ahead(others);
-    vector<Vehicle> vehicles_behind = ego.behind(others);
-    vector<Vehicle> vehicles_left = ego.side(others, 'L');
-    vector<Vehicle> vehicles_right = ego.side(others, 'R');
+vector<vector<Vehicle>> prepare_cost(Vehicle* ego, vector<Vehicle> const others){
+    vector<Vehicle> vehicles_ahead = ego->ahead(others);
+    vector<Vehicle> vehicles_behind = ego->behind(others);
+    vector<Vehicle> vehicles_left = ego->side(others, 'L');
+    vector<Vehicle> vehicles_right = ego->side(others, 'R');
     return {vehicles_ahead, vehicles_behind, vehicles_left, vehicles_right};
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                     /////     Legality Cost      /////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float subcost_Speed(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
+float subcost_Speed(Vehicle* ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
     // cost function for maintaining highest speed/ speed limit possible
     float target_speed = MAX_SPEED_MS;
     float cost;
-    if (ego.speed > target_speed){
+    if (ego->speed > target_speed){
         cost = 1;
     }
-    else if (ego.speed <= target_speed){
-        cost = 1 - (ego.speed/ target_speed);
+    else if (ego->speed <= target_speed){
+        cost = 1 - (ego->speed/ target_speed);
     }
     return cost;
 }
 
-float subcost_BufferDistance(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
+float subcost_BufferDistance(Vehicle* ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
     // cost function for buffering a distance with other surroundings vehicles
     double buffer = BUFFER_RANGE;
     vector<Vehicle> ahead = surroundings[0];
@@ -68,14 +68,14 @@ float subcost_BufferDistance(State state, Vehicle ego, vector<vector<Vehicle>> c
     float cost_1, cost_2, cost;
 
     if (!ahead.empty()){
-        cost_1 = exp(-((ahead[0].s - ego.s)/ buffer));
+        cost_1 = exp(-((ahead[0].s - ego->s)/ buffer));
     }
     else if (ahead.empty()){
         cost_1 = 0;
     }
 
     if (!behind.empty()){
-        cost_2 = exp(-((ego.s - behind[0].s)/ buffer));
+        cost_2 = exp(-((ego->s - behind[0].s)/ buffer));
     }
     else if (behind.empty()){
         cost_2 = 0;
@@ -85,8 +85,11 @@ float subcost_BufferDistance(State state, Vehicle ego, vector<vector<Vehicle>> c
     return cost;
 }
 
-float costfunc_Legality(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
-
+float costfunc_Legality(Vehicle* ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
+    double cost_1 = subcost_Speed(ego, surroundings, T, weight);
+    double cost_2 = subcost_BufferDistance(ego, surroundings, T, weight);
+    double cost = (cost_1 + cost_2)/2;
+    return cost;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -96,11 +99,12 @@ float costfunc_Legality(State state, Vehicle ego, vector<vector<Vehicle>> const 
 float subcost_LaneChange(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
     // Cost function for lane changing
     int start_lane = state.current_lane;
-    int final_lane = state.intended_lane;
+    int intended_lane = state.intended_lane;
     float current_speed = ego.speed;
-    float new_speed = lane_speed(surroundings, final_lane);
+    float new_speed = lane_speed(surroundings, intended_lane);
     float cost;
     float distance_to_goal = abs(TRACK_LENGTH - ego.s);
+    
 
     // TODO: How long the lane change takes, must be less or equals to 3s
 }
@@ -108,9 +112,9 @@ float subcost_LaneChange(State state, Vehicle ego, vector<vector<Vehicle>> const
 float subcost_SpeedChange(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
     // Penalize negative speed change
     int start_lane = state.current_lane;
-    int final_lane = state.intended_lane;
+    int intended_lane = state.intended_lane;
     float current_speed = ego.speed;
-    float new_speed = lane_speed(surroundings, final_lane);
+    float new_speed = lane_speed(surroundings, intended_lane);
     float speed_change = (new_speed - current_speed)/ current_speed;
     float cost;
 
@@ -126,7 +130,7 @@ float subcost_SpeedChange(State state, Vehicle ego, vector<vector<Vehicle>> cons
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float subcost_LongitudinalCollision(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
     int start_lane = state.current_lane;
-    int final_lane = state.intended_lane;
+    int intended_lane = state.intended_lane;
     double buffer = BUFFER_RANGE;
     vector<Vehicle> vehicles_ahead = surroundings[0];
     vector<Vehicle> vehicles_behind = surroundings[1];
@@ -155,7 +159,7 @@ float subcost_LongitudinalCollision(State state, Vehicle ego, vector<vector<Vehi
 
 float subcost_LatitudinalCollision(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight, char mode){
     int start_lane = state.current_lane;
-    int final_lane = state.intended_lane;
+    int intended_lane = state.intended_lane;
     double buffer = BUFFER_RANGE*1.2;
     vector<Vehicle> vehicles_left = surroundings[2];
     vector<Vehicle> vehicles_right = surroundings[3];
@@ -210,7 +214,7 @@ float subcost_LatitudinalCollision(State state, Vehicle ego, vector<vector<Vehic
 
 float costfunc_Collision(State state, Vehicle ego, vector<vector<Vehicle>> const surroundings, double T, double weight){
     int start_lane = state.current_lane;
-    int final_lane = state.intended_lane;
+    int intended_lane = state.intended_lane;
     vector<Vehicle> vehicles_ahead = surroundings[0];
     vector<Vehicle> vehicles_behind = surroundings[1];
     float lat_cost, long_cost, cost;
@@ -222,12 +226,8 @@ float costfunc_Collision(State state, Vehicle ego, vector<vector<Vehicle>> const
         cost = long_cost;
     }
     else if (state.id != "KL"){
-        if (state.id.back() == 'L'){
-            mode = 'L';
-        }
-        else if (state.id.back() == 'R'){
-            mode = 'R';
-        }
+        if (state.id.back() == 'L'){ mode = 'L'; }
+        else if (state.id.back() == 'R'){ mode = 'R'; }
         lat_cost = subcost_LatitudinalCollision(state, ego, surroundings, T, weight, mode);
         long_cost = subcost_LongitudinalCollision(state, ego, surroundings, T, weight);
         cost = (lat_cost + long_cost)/ 2;
@@ -240,13 +240,14 @@ float costfunc_Collision(State state, Vehicle ego, vector<vector<Vehicle>> const
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                     /////     Comfort Cost      /////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float subcost_Acceleration(State state, Vehicle ego, Trajectory trajectory, double T, double weight){
+float subcost_Acceleration(State* state, Vehicle* ego, Trajectory *trajectory, double T, double weight){
     double max_acceleration = MAX_ACCELERATION;
-    vector<double> traj_acceleration = {trajectory.s_dd, trajectory.d_dd};
+    vector<double> k = ego->kinematics;
+    vector<double> traj_acceleration = {k[2], k[5]};
     double acceleration = sqrt(pow(traj_acceleration[0], 2) + pow(traj_acceleration[1], 2));
     float cost;
 
-    if ((acceleration >= max_acceleration) || (ego.s >= MAX_SPEED_MS)){
+    if ((acceleration >= max_acceleration) || (ego->speed >= MAX_SPEED_MS)){
         cost = 1;
     }
     else if (acceleration < max_acceleration){
@@ -256,15 +257,10 @@ float subcost_Acceleration(State state, Vehicle ego, Trajectory trajectory, doub
     return cost;
 }
 
-float subcost_Jerk(State state, Vehicle ego, Trajectory trajectory, double T, double weight){
+float subcost_Jerk(State* state, Vehicle* ego, Trajectory* trajectory, double T, double weight){
     double max_jerk = MAX_JERK;
     float cost = 0;
     return cost;
-}
-
-float costfunc_Feasibility(State state, Vehicle ego, vector<vector<Vehicle>> const others, double T, double weight){
-    int start_lane = state.current_lane;
-    int final_lane = state.intended_lane;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -2,9 +2,11 @@
 #define VEHICLE_H
 #include <iostream>
 #include <vector>
-#include "mapping.h"
-#include "behaviour.h"
 #include "constants.h"
+
+class State;
+class Vehicle;
+class Mapping;
 
 class Vehicle {
     public:
@@ -24,13 +26,15 @@ class Vehicle {
         int lane;
         double speed;
         double theta;
-        State state;
+        vector<double> kinematics;
 
+        State* state;
         Mapping* map;
 
         Vehicle();
         Vehicle(int id, double x, double y, double vx, double vy, double s, double d, Mapping* map);
-        Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double yaw, State state, Mapping* map);
+        Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double yaw,
+                    vector<double> kinematics, State* state, Mapping* map);
 
         virtual ~Vehicle();
 

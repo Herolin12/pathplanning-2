@@ -2,13 +2,11 @@
 #define BEHAVIOUR_H
 
 #include <iostream>
+#include <map>
 #include <math.h>
 #include <string>
 #include <vector>
-#include "trajectory.h"
-#include "vehicle.h"
 #include "helpers.h"
-#include "mapping.h"
 #include "constants.h"
 #include "spline.h"
 
@@ -17,33 +15,40 @@ using std::string;
 using std::vector;
 using std::cout;
 using std::sort;
+using std::map;
+
+class Trajectory;
+class Vehicle;
+class Mapping;
 
 class State {
     public:
         string id;
         int current_lane;
         int intended_lane;
+        int time_ahead;
 
         State();
-        State(string id, int current_lane, int intended_lane);
+        State(string id, int lane);
 
         virtual ~State();
 };
 
 class Behaviour {
     public:
-        int lane;
+        Vehicle* ego;
         double ref_vel;
         int current_timestep;
-        State current_state;
+        vector<State> states;
 
         Behaviour();
-        Behaviour(double ref_vel);
+        Behaviour(Vehicle* ego, double ref_vel);
 
         virtual ~Behaviour();
 
-        vector<string> available_states();
-        vector<Trajectory> generate_trajectory(vector<Vehicle> predictions, double T);
+        vector<State> available_states();
+        vector<Trajectory> generate_trajectory(vector<double> x, vector<double> y);
+        Trajectory get_best_trajectory(vector<Trajectory> trajectories, vector<Vehicle> predictions);
 };
 
 #endif

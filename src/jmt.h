@@ -59,8 +59,26 @@ vector<vector<double>> get_jmt(vector<double> initial, vector<double> final, dou
     vector<double> jmt_d = JMT(start_d, end_d, T);
 
     vector<vector<double>> output = {jmt_s, jmt_d};
-    
+
     return output;
+}
+
+vector<double> polysolver(double x1, double x2, double x3, vector<double> alpha, double t){
+    double t_2 = pow(t, 2);
+    double t_3 = pow(t, 3);
+    double t_4 = pow(t, 4);
+    double t_5 = pow(t, 5);
+    double xt = x1 + x2*t + 0.5*x3*t_2 + alpha[3]*t_3 + alpha[4]* t_4+ alpha[5]*t_5;
+    double xt_d = x2 + x3*t + 3*alpha[3]*t_2 + 4*alpha[4]*t_3 + 5*alpha[5]*t_4;
+    double xt_dd = x3 + 6*alpha[3]*t + 12*alpha[4]*t_2 + 20*alpha[5]*t_3;
+    double xt_ddd = 6 * alpha[3] + 24*alpha[4]*t + 60*alpha[5]*t_2;
+    return {xt, xt_d, xt_dd, xt_ddd};
+}
+
+vector<vector<double>> generation_next_waypoints(vector<double> start, vector<double> target, vector<double> alpha_s, vector<double> alpha_d, double t){
+    vector<double> next_s = polysolver(start[0], start[1], start[2], alpha_s, t);
+    vector<double> next_d = polysolver(start[3], start[4], start[5], alpha_d, t);
+    return {next_s, next_d};
 }
 
 #endif

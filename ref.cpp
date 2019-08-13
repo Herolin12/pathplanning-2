@@ -364,7 +364,7 @@ int main() {
 						pos_s = frenet[0];
 						pos_d = frenet[1];
 
-						// determine dx, dy vector from set of interpoated waypoints, with pos_x,pos_y as reference point;
+						// determine dx, dy vector from set of interpolated waypoints, with pos_x,pos_y as reference point;
 						// since interpolated waypoints are ~1m apart and path points tend to be <0.5m apart, these 
 						// values can be reused for previous two points (and using the previous waypoint data may be
 						// more accurate) to calculate vel_s (s_dot), vel_d (d_dot), acc_s (s_ddot), and acc_d (d_ddot)

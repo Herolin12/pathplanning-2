@@ -207,31 +207,17 @@ int main() {
           }
 
           vector<Trajectory> trajectories = planner.generate_trajectory(points_x, points_y);
+          cout << "no" << endl;
           best_trajectory = planner.get_best_trajectory(trajectories, surrounding_vehicles);
+          cout << "best" ;
 
-          vector<Vehicle> vehicles_ahead = ego.ahead(surrounding_vehicles);
-          Vehicle car_ahead;
 
           // For every 0.02 sec blocks, max acceleration/ displacement is 0.004m
           double new_s = car_s;
-          double new_d, new_x, new_y;
-          bool slow_down;
           vector<double> xy;
           distance_spacing = 0.224;
 
-          if ((!vehicles_ahead.empty()) && ((car_ahead.s - ego.s) <= BUFFER_RANGE)){
-            slow_down = true;
-          }
-          else {
-            slow_down = false;
-          }
-
-          if (slow_down){
-            ref_vel -= distance_spacing;
-          }
-          else if (ref_vel <= MAX_SPEED_MILES){
-            ref_vel += distance_spacing;
-          }
+          ref_vel += distance_spacing;
 
           double increment = .02*ref_vel/2.24;
           for (int i = 0; i < 50; i++) {
@@ -241,6 +227,7 @@ int main() {
             //next_x_vals.push_back(xy[0]);
             //next_y_vals.push_back(xy[1]);
           }
+
           next_x_vals = best_trajectory.x;
           next_y_vals = best_trajectory.y;
 

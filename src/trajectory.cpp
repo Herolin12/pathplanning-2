@@ -55,9 +55,10 @@ void Trajectory::generate(){
 
 float Trajectory::cost(vector<vector<Vehicle>> surroundings){
     float cost;
-    float legality_cost = costfunc_Legality(this->ego, surroundings, this->time_to_complete, LEGALITY_COST);
+    float legality_cost = costfunc_Legality(this, surroundings, this->time_to_complete, LEGALITY_COST);
+    float efficiency_cost = costfunc_Efficiency(this, surroundings, this->time_to_complete, EFFICIENCY_COST);
 
-    cost = legality_cost;
+    cost = (legality_cost + efficiency_cost)/ 2;
     return cost;
 }
 

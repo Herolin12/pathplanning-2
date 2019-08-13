@@ -67,10 +67,11 @@ double Vehicle::get_speed() const {
     return sqrt(this->vx * this->vx + this->vy * this->vy);
 }
 
-vector<Vehicle> Vehicle::ahead(vector<Vehicle> others){
+vector<Vehicle> Vehicle::ahead(vector<Vehicle> others, double T){
     vector<Vehicle> vehicles_ahead;
     for (Vehicle &v: others){
         if ((v.lane == this->lane) && (v.s >= this->s)){
+            v = v.predict_position(T);
             vehicles_ahead.push_back(v);
         }
         else {
@@ -84,10 +85,11 @@ vector<Vehicle> Vehicle::ahead(vector<Vehicle> others){
     return vehicles_ahead;
 }
 
-vector<Vehicle> Vehicle::behind(vector<Vehicle> others){
+vector<Vehicle> Vehicle::behind(vector<Vehicle> others, double T){
     vector<Vehicle> vehicles_behind;
     for (Vehicle &v: others){
         if ((v.lane == this->lane) && (v.s < this->s)){
+            v = v.predict_position(T);
             vehicles_behind.push_back(v);
         }
         else {
@@ -100,7 +102,7 @@ vector<Vehicle> Vehicle::behind(vector<Vehicle> others){
     return vehicles_behind;
 }
 
-vector<Vehicle> Vehicle::side(vector<Vehicle> others, char mode){
+vector<Vehicle> Vehicle::side(vector<Vehicle> others, double T, char mode){
     vector<Vehicle> vehicles_side;
     int check_lane;
     if (mode == 'L'){
@@ -112,6 +114,7 @@ vector<Vehicle> Vehicle::side(vector<Vehicle> others, char mode){
 
     for (Vehicle &v: others){
         if (v.lane == check_lane){
+            v = v.predict_position(T);
             vehicles_side.push_back(v);
         }
         else {

@@ -28,9 +28,18 @@ State::State(){}
 State::State(string id, int lane){
     this->id = id;
     this->current_lane = lane;
-    if ((this->id != "LCL") || (this->id != "LCR")){
+    if ((this->id == "KL") || (this->id == "RDY")){
         this->intended_lane = this->current_lane;
         this->time_ahead = 1;
+    }
+    else if ((this->id != "PLCL") || (this->id != "PLCR")){
+        this->time_ahead = 1;
+        if (this->id == "PLCL"){
+            this->intended_lane = this->current_lane - 1;
+        }
+        else if (this->id == "PLCR"){
+            this->intended_lane = this->current_lane + 1;
+        }
     }
     else if (this->id == "LCL"){
         this->intended_lane = this->current_lane - 1;
@@ -117,14 +126,16 @@ vector<Trajectory> Behaviour::generate_trajectory(vector<double> x, vector<doubl
 
 Trajectory Behaviour::get_best_trajectory(vector<Trajectory> trajectories, vector<Vehicle> predictions){
     // Get sensor fusions and classify them into cars ahead, behind, left or right
-    vector<vector<Vehicle>> surroundings = prepare_cost(this->ego, predictions);
+    vector<vector<Vehicle>> surroundings;
     float cost;
     vector<float> traj_cost;
     for (Trajectory& traj: trajectories){
+        surroundings = prepare_cost(this->ego, predictions, traj.time_to_complete);
         cost = traj.cost(surroundings);
         traj_cost.push_back(cost);
     }
     int best = min_element(traj_cost.begin(), traj_cost.end()) - traj_cost.begin();
+    cout << "best: " << best << endl;
     return trajectories[best];
 }
 

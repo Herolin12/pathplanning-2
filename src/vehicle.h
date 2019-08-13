@@ -41,11 +41,11 @@ class Vehicle {
         // Returns a new vehicle at the next timestep
         Vehicle predict_position(double t);
 
-        vector<Vehicle> ahead(vector<Vehicle> others);
+        vector<Vehicle> ahead(vector<Vehicle> others, double T);
 
-        vector<Vehicle> behind(vector<Vehicle> others);
+        vector<Vehicle> behind(vector<Vehicle> others, double T);
 
-        vector<Vehicle> side(vector<Vehicle> others, char mode);
+        vector<Vehicle> side(vector<Vehicle> others, double T, char mode);
 
         bool sort_distance_to_ego(const Vehicle& left, const Vehicle& right);
 

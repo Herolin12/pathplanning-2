@@ -78,6 +78,7 @@ vector<double> polysolver(double x1, double x2, double x3, vector<double> alpha,
 vector<vector<double>> generation_next_waypoints(vector<double> start, vector<double> target, vector<double> alpha_s, vector<double> alpha_d, double t){
     vector<double> next_s = polysolver(start[0], start[1], start[2], alpha_s, t);
     vector<double> next_d = polysolver(start[3], start[4], start[5], alpha_d, t);
+
     return {next_s, next_d};
 }
 
